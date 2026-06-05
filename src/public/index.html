@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Esthyfav Collection – Your one-stop shop for trendy unisex wears, stylish bags, comfortable shoes, girly essentials, and quality household items.">
+    <title>Esthyfav Collection | Premium Lifestyle Store</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0A0A0A;
+            --bg-secondary: #111111;
+            --bg-card: #1A1A1A;
+            --bg-footer: #050505;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B0B0B0;
+            --accent: #D4AF37;
+            --accent-dark: #B8960F;
+            --accent-glow: rgba(212, 175, 55, 0.15);
+            --border-color: rgba(212, 175, 55, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+        .loading-logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent) 0%, #FFF 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--accent-glow);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 40px;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--text-primary) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            cursor: pointer;
+        }
+        .nav-links { display: flex; gap: 30px; align-items: center; }
+        .nav-links a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+        .nav-links a:hover { color: var(--accent); }
+        .mobile-menu { display: none; font-size: 1.5rem; cursor: pointer; }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-bg-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, var(--accent-glow) 0%, transparent 70%);
+            animation: pulseGlow 6s infinite;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.05); }
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 100px 20px;
+        }
+        .hero-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--accent-glow);
+            border: 1px solid var(--accent);
+            border-radius: 50px;
+            font-size: 0.8rem;
+            color: var(--accent);
+            margin-bottom: 25px;
+        }
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+        .gold-text { color: var(--accent); }
+        .hero p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .btn-group { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.3s;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #000;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
+        }
+        .btn-outline {
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            background: transparent;
+        }
+        .btn-outline:hover {
+            background: var(--accent);
+            color: #000;
+            transform: translateY(-3px);
+        }
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+        .stat-item { text-align: center; }
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
+
+        /* Sections */
+        .section { padding: 80px 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .section-title {
+            text-align: center;
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 50px;
+        }
+        .section-divider {
+            width: 60px;
+            height: 3px;
+            background: var(--accent);
+            margin: 20px auto 0;
+        }
+
+        /* Category Grid */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-top: 50px;
+        }
+        .category-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid var(--border-color);
+        }
+        .category-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .category-icon { font-size: 3rem; margin-bottom: 15px; }
+        .category-card h3 { margin-bottom: 8px; }
+        .category-card p { color: var(--accent); font-size: 0.9rem; }
+
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        .product-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s;
+            border: 1px solid var(--border-color);
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+        .product-image {
+            height: 260px;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .bestseller-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--accent);
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .product-info { padding: 20px; }
+        .product-info h4 { margin-bottom: 8px; font-size: 1.1rem; }
+        .product-price {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+        .product-whatsapp {
+            width: 100%;
+            padding: 10px;
+            background: #25D366;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .product-whatsapp:hover {
+            background: #128C7E;
+            transform: scale(1.02);
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        .feature-card {
+            text-align: center;
+            padding: 30px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+        .feature-icon { font-size: 2.5rem; color: var(--accent); margin-bottom: 15px; }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            border-radius: 30px;
+            padding: 60px 40px;
+            text-align: center;
+            margin: 40px 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Contact Form */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 50px;
+        }
+        .contact-info { background: var(--bg-card); padding: 35px; border-radius: 20px; }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding: 12px;
+            border-radius: 12px;
+        }
+        .contact-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--accent-glow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--accent);
+        }
+        .contact-form { background: var(--bg-card); padding: 35px; border-radius: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-footer);
+            padding: 60px 20px 30px;
+            margin-top: 60px;
+            border-top: 1px solid var(--border-color);
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .footer-col h4 { color: var(--accent); margin-bottom: 20px; }
+        .footer-col p, .footer-col a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            line-height: 1.8;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .footer-col a:hover { color: var(--accent); }
+        .social-links { display: flex; gap: 15px; margin-top: 20px; }
+        .social-links a {
+            width: 38px;
+            height: 38px;
+            background: var(--bg-card);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 40px;
+            margin-top: 40px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+        .dev-credit { color: var(--accent); font-weight: 600; }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--accent);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            z-index: 1100;
+            transition: transform 0.3s;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar { padding: 15px 20px; }
+            .nav-links { display: none; }
+            .mobile-menu { display: block; }
+            .hero-stats { gap: 20px; }
+            .section { padding: 50px 15px; }
+            .cta-section { padding: 40px 20px; margin: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div class="loading-screen" id="loadingScreen">
+    <div class="loading-logo">ESTHYFAV</div>
+    <div class="loading-spinner"></div>
+    <div class="loading-text" style="margin-top: 20px; color: #888;">Loading luxury collection...</div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✨ Welcome to Esthyfav</div>
+
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="logo">ESTHYFAV ✦ COLLECTION</div>
+    <div class="nav-links">
+        <a href="#home">Home</a>
+        <a href="#categories">Shop</a>
+        <a href="#products">Products</a>
+        <a href="#contact">Contact</a>
+        <a href="https://wa.me/2347058987882" class="btn-outline" style="padding: 8px 20px;">📞 WhatsApp</a>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">☰</div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero" id="home">
+    <div class="hero-bg-effect"></div>
+    <div class="hero-content">
+        <span class="hero-badge">✦ Premium Quality Since 2024 ✦</span>
+        <h1>
+            <span class="gold-text">ESTHYFAV</span><br>
+            COLLECTION
+        </h1>
+        <p>Your one-stop destination for trendy unisex wears, stylish bags,<br> comfy shoes, girly essentials, and quality household items.</p>
+        <div class="btn-group">
+            <a href="#products" class="btn btn-primary">🛒 Shop Now</a>
+            <a href="https://wa.me/2347058987882" class="btn btn-outline">📞 Order on WhatsApp</a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat-item"><div class="stat-number" id="statProducts">500+</div><div class="stat-label">Happy Customers</div></div>
+            <div class="stat-item"><div class="stat-number" id="statCategories">5</div><div class="stat-label">Categories</div></div>
+            <div class="stat-item"><div class="stat-number">24/7</div><div class="stat-label">Support</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="section" id="categories">
+    <div class="container">
+        <h2 class="section-title">Shop by Category</h2>
+        <p class="section-subtitle">Find exactly what you're looking for</p>
+        <div class="section-divider"></div>
+        <div class="category-grid" id="categoriesGrid">
+            <div class="category-card"><div class="category-icon">👕</div><h3>Unisex Wears</h3><p>Streetwear & Comfort</p></div>
+            <div class="category-card"><div class="category-icon">👜</div><h3>Stylish Bags</h3><p>Classy & Durable</p></div>
+            <div class="category-card"><div class="category-icon">👟</div><h3>Comfy Shoes</h3><p>Walk in Style</p></div>
+            <div class="category-card"><div class="category-icon">🎀</div><h3>Girly Essentials</h3><p>Selfcare & Beauty</p></div>
+            <div class="category-card"><div class="category-icon">🏠</div><h3>Household Items</h3><p>Quality Living</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- Bestsellers Section -->
+<section class="section" id="products">
+    <div class="container">
+        <h2 class="section-title">🔥 Bestsellers</h2>
+        <p class="section-subtitle">What everyone's buying right now</p>
+        <div class="section-divider"></div>
+        <div class="products-grid" id="productsGrid">
+            <!-- Products loaded from API -->
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Why Choose Esthyfav?</h2>
+        <div class="section-divider"></div>
+        <div class="features-grid">
+            <div class="feature-card"><div class="feature-icon">💰</div><h4>Affordable Prices</h4><p>Premium quality without breaking the bank</p></div>
+            <div class="feature-card"><div class="feature-icon">✅</div><h4>Quality Guaranteed</h4><p>Every product inspected before shipping</p></div>
+            <div class="feature-card"><div class="feature-icon">🚚</div><h4>Fast Delivery</h4><p>Nationwide shipping with tracking</p></div>
+            <div class="feature-card"><div class="feature-icon">💬</div><h4>24/7 Support</h4><p>We reply within minutes</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<div class="cta-section">
+    <h2>Ready to elevate your style?</h2>
+    <p style="margin-top: 15px; color: var(--text-secondary);">Shop now and get free delivery on orders over ₦50,000</p>
+    <div class="btn-group" style="margin-top: 30px;">
+        <a href="https://wa.me/2347058987882" class="btn btn-primary">Order via WhatsApp →</a>
+    </div>
+</div>
+
+<!-- Contact Section -->
+<section class="section" id="contact">
+    <div class="container">
+        <h2 class="section-title">Get in Touch</h2>
+        <div class="section-divider"></div>
+        <div class="contact-grid">
+            <div class="contact-info">
+                <div class="contact-item"><div class="contact-icon"><i class="fas fa-phone"></i></div><div><h4>Call Us</h4><p>+234 705 898 7882</p></div></div>
+                <div class="contact-item"><div class="contact-icon"><i class="fab fa-whatsapp"></i></div><div><h4>WhatsApp</h4><p>+234 705 898 7882</p></div></div>
+                <div class="contact-item"><div class="contact-icon"><i class="fas fa-envelope"></i></div><div><h4>Email</h4><p>famousmichelle915@gmail.com</p></div></div>
+                <div class="contact-item"><div class="contact-icon"><i class="fas fa-clock"></i></div><div><h4>Response Time</h4><p>Within 24 hours</p></div></div>
+            </div>
+            <div class="contact-form">
+                <h3 style="margin-bottom: 20px;">Send us a message</h3>
+                <form id="contactForm">
+                    <div class="form-group"><input type="text" id="contactName" placeholder="Your Name" required></div>
+                    <div class="form-group"><input type="email" id="contactEmail" placeholder="Your Email" required></div>
+                    <div class="form-group"><input type="tel" id="contactPhone" placeholder="Your Phone (optional)"></div>
+                    <div class="form-group"><textarea id="contactMessage" placeholder="Your Message" rows="4" required></textarea></div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message →</button>
+                </form>
+                <div id="formStatus" style="margin-top: 15px; text-align: center;"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-grid">
+        <div class="footer-col"><h4>ESTHYFAV COLLECTION</h4><p>Your one-stop shop for style & home essentials. Quality products at affordable prices.</p></div>
+        <div class="footer-col"><h4>Quick Links</h4><a href="#home">Home</a><a href="#products">Shop</a><a href="#contact">Contact</a></div>
+        <div class="footer-col"><h4>Contact Info</h4><p><i class="fas fa-phone"></i> +234 705 898 7882</p><p><i class="fab fa-whatsapp"></i> WhatsApp: +234 705 898 7882</p><p><i class="fas fa-envelope"></i> famousmichelle915@gmail.com</p></div>
+        <div class="footer-col"><h4>Follow Us</h4><div class="social-links"><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-facebook"></i></a><a href="https://wa.me/2347058987882"><i class="fab fa-whatsapp"></i></a></div></div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2024 Esthyfav Collection. All rights reserved.</p>
+        <p style="margin-top: 10px;">🧑‍💻 Website built by <span class="dev-credit">Dev Gift</span> | WhatsApp: 09164624021</p>
+    </div>
+</footer>
+
+<script>
+    const API_URL = 'http://localhost:3000/api';
+
+    // Hide loading screen
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            const loader = document.getElementById('loadingScreen');
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 500);
+        }, 1000);
+    });
+
+    // Load products from API
+    async function loadProducts() {
+        try {
+            const res = await fetch(`${API_URL}/products`);
+            const products = await res.json();
+            const bestsellers = products.filter(p => p.isBestseller).slice(0, 8);
+            const grid = document.getElementById('productsGrid');
+            if (grid) {
+                grid.innerHTML = bestsellers.map(p => `
+                    <div class="product-card">
+                        <div class="product-image" style="background-image: url('${p.imageUrl || 'https://placehold.co/400x300/1A1A1A/D4AF37?text=Esthyfav'}');">
+                            <span class="bestseller-badge">⭐ Bestseller</span>
+                        </div>
+                        <div class="product-info">
+                            <h4>${p.name}</h4>
+                            <div class="product-price">${p.price}</div>
+                            <button class="product-whatsapp" onclick="orderOnWhatsApp('${p.name}', '${p.price}')">Order on WhatsApp →</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('statProducts').innerText = products.length + '+';
+        } catch (err) {
+            console.error('Error loading products:', err);
+        }
+    }
+
+    // Load categories
+    async function loadCategories() {
+        try {
+            const res = await fetch(`${API_URL}/categories`);
+            const categories = await res.json();
+            const grid = document.getElementById('categoriesGrid');
+            if (grid && categories.length > 0) {
+                grid.innerHTML = categories.map(c => `
+                    <div class="category-card" onclick="filterByCategory('${c.name}')">
+                        <div class="category-icon">${c.icon || '📦'}</div>
+                        <h3>${c.name}</h3>
+                        <p>Shop Now →</p>
+                    </div>
+                `).join('');
+            }
+            document.getElementById('statCategories').innerText = categories.length;
+        } catch (err) {
+            console.error('Error loading categories:', err);
+        }
+    }
+
+    // Order on WhatsApp
+    function orderOnWhatsApp(productName, productPrice) {
+        const phone = '2347058987882';
+        const message = `Hello Esthyfav Collection! I'm interested in ordering: ${productName} - ${productPrice}. Please let me know if it's available.`;
+        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        showToast('🛍️ Redirecting to WhatsApp...');
+    }
+
+    function filterByCategory(category) {
+        showToast(`🔍 Showing ${category} products`);
+        // Scroll to products section
+        document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Contact form submission
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = {
+                name: document.getElementById('contactName').value,
+                email: document.getElementById('contactEmail').value,
+                phone: document.getElementById('contactPhone').value,
+                message: document.getElementById('contactMessage').value
+            };
+            try {
+                const res = await fetch(`${API_URL}/contact`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('✅ Message sent! We will reply soon.');
+                    contactForm.reset();
+                } else {
+                    showToast('❌ Error sending message. Try WhatsApp.');
+                }
+            } catch (err) {
+                showToast('❌ Error. Please WhatsApp us directly.');
+            }
+        });
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Mobile menu toggle
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (mobileMenu) {
+        mobileMenu.addEventListener('click', () => {
+            const navLinks = document.querySelector('.nav-links');
+            if (navLinks.style.display === 'flex') {
+                navLinks.style.display = 'none';
+            } else {
+                navLinks.style.display = 'flex';
+                navLinks.style.flexDirection = 'column';
+                navLinks.style.position = 'absolute';
+                navLinks.style.top = '70px';
+                navLinks.style.left = '0';
+                navLinks.style.width = '100%';
+                navLinks.style.background = '#0A0A0A';
+                navLinks.style.padding = '20px';
+                navLinks.style.borderBottom = '1px solid #D4AF37';
+            }
+        });
+    }
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) target.scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // Load data
+    loadProducts();
+    loadCategories();
+</script>
+</body>
+</html>
