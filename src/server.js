@@ -15,10 +15,16 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
 
+// ========== FIX: Serve admin.html at /admin route ==========
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+// Create uploads folder
 if (!fs.existsSync('./uploads')) fs.mkdirSync('./uploads');
 
 mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('✅ MongoDB Connected to Esthyfav'))
+    .then(() => console.log('✅ MongoDB Connected'))
     .catch(err => console.error('❌ MongoDB Error:', err));
 
 // ========== SCHEMAS ==========
