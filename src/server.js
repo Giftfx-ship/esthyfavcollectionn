@@ -6,7 +6,6 @@ const multer = require('multer');
 const path = require('path');
 const cors = require('cors');
 const fs = require('fs');
-require('dotenv').config();
 
 const app = express();
 
@@ -19,106 +18,46 @@ app.use('/uploads', express.static('uploads'));
 // Create uploads folder
 if (!fs.existsSync('./uploads')) fs.mkdirSync('./uploads');
 
-// ========== SERVE HTML FILES ==========
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-});
-
-// ========== PING ENDPOINT FOR KEEP ALIVE ==========
-app.get('/ping', (req, res) => {
-    res.json({ 
-        status: 'alive', 
-        timestamp: new Date().toISOString(),
-        message: 'Esthyfav Collection is running!'
-    });
-});
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-    res.status(200).json({ 
-        status: 'healthy', 
-        uptime: process.uptime(),
-        timestamp: new Date().toISOString()
-    });
-});
-
-// ========== AUTO SELF-PING SYSTEM ==========
-// This pings itself every 10 minutes to keep Render awake
-const SELF_URL = process.env.RENDER_EXTERNAL_URL || 'https://esthyfavcollectionn.onrender.com';
-
-function selfPing() {
-    fetch(`${SELF_URL}/ping`)
-        .then(res => res.json())
-        .then(data => console.log(`✅ Self-ping successful at ${new Date().toISOString()}`))
-        .catch(err => console.log(`⚠️ Self-ping failed: ${err.message}`));
-}
-
-// Ping every 10 minutes (600,000 ms)
-setInterval(selfPing, 10 * 60 * 1000);
-
-// Also ping on startup
-setTimeout(selfPing, 1000);
-console.log(`🔄 Auto self-ping enabled every 10 minutes to ${SELF_URL}`);
-
 // ========== MONGODB CONNECTION ==========
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://mrdev:dev091339@cluster0.grjlq7v.mongodb.net/esthyfav?retryWrites=true&w=majority';
+const MONGODB_URI = 'mongodb+srv://mrdev:dev091339@cluster0.grjlq7v.mongodb.net/esthyfav?retryWrites=true&w=majority';
 
 mongoose.connect(MONGODB_URI)
     .then(() => console.log('✅ MongoDB Connected'))
-    .catch(err => {
-        console.error('❌ MongoDB Error:', err.message);
-        console.log('⚠️ Running without database - using demo mode');
-    });
+    .catch(err => console.log('⚠️ MongoDB Error:', err.message));
 
 // ========== SCHEMAS ==========
 const productSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    price: { type: String, required: true },
-    category: { type: String, required: true },
-    imageUrl: { type: String },
-    isBestseller: { type: Boolean, default: false },
-    description: { type: String },
+    name: String,
+    price: String,
+    category: String,
+    imageUrl: String,
+    isBestseller: Boolean,
     createdAt: { type: Date, default: Date.now }
 });
 
 const categorySchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    slug: { type: String, required: true, unique: true },
-    icon: { type: String },
-    imageUrl: { type: String },
-    isActive: { type: Boolean, default: true }
+    name: String,
+    slug: String,
+    icon: String,
+    imageUrl: String
 });
 
-const brandSettingSchema = new mongoose.Schema({
-    key: { type: String, required: true, unique: true },
-    value: { type: String },
-    imageUrl: { type: String }
-});
-
-const contactMessageSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true },
-    phone: { type: String },
-    message: { type: String, required: true },
-    isRead: { type: Boolean, default: false },
+const contactSchema = new mongoose.Schema({
+    name: String,
+    email: String,
+    phone: String,
+    message: String,
     createdAt: { type: Date, default: Date.now }
 });
 
 const adminSchema = new mongoose.Schema({
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    name: { type: String, default: 'Admin' }
+    email: String,
+    password: String
 });
 
-// Models
 const Product = mongoose.model('Product', productSchema);
 const Category = mongoose.model('Category', categorySchema);
-const BrandSetting = mongoose.model('BrandSetting', brandSettingSchema);
-const ContactMessage = mongoose.model('ContactMessage', contactMessageSchema);
+const Contact = mongoose.model('Contact', contactSchema);
 const Admin = mongoose.model('Admin', adminSchema);
 
 // ========== FILE UPLOAD ==========
@@ -132,16 +71,31 @@ const upload = multer({ storage });
 
 // ========== AUTH MIDDLEWARE ==========
 const verifyToken = (req, res, next) => {
-    const token = req.headers['authorization'];
-    if (!token) return res.status(401).json({ error: 'No token provided' });
-    jwt.verify(token, process.env.JWT_SECRET || 'esthyfav_secret_key', (err, decoded) => {
-        if (err) return res.status(401).json({ error: 'Invalid token' });
+    const token = req.headers.authorization;
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    try {
+        const decoded = jwt.verify(token, 'esthyfav_secret_key');
         req.adminId = decoded.id;
         next();
-    });
+    } catch (err) {
+        res.status(401).json({ error: 'Invalid token' });
+    }
 };
 
-// ========== PUBLIC ROUTES ==========
+// ========== SERVE HTML FILES ==========
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+app.get('/ping', (req, res) => {
+    res.json({ status: 'alive', timestamp: new Date().toISOString() });
+});
+
+// ========== PUBLIC API ==========
 app.get('/api/products', async (req, res) => {
     try {
         const products = await Product.find().sort({ createdAt: -1 });
@@ -153,7 +107,7 @@ app.get('/api/products', async (req, res) => {
 
 app.get('/api/categories', async (req, res) => {
     try {
-        const categories = await Category.find({ isActive: true });
+        const categories = await Category.find();
         res.json(categories);
     } catch (err) {
         res.json([]);
@@ -163,7 +117,7 @@ app.get('/api/categories', async (req, res) => {
 app.post('/api/contact', async (req, res) => {
     try {
         const { name, email, phone, message } = req.body;
-        const contact = new ContactMessage({ name, email, phone, message });
+        const contact = new Contact({ name, email, phone, message });
         await contact.save();
         res.json({ success: true, message: 'Message sent!' });
     } catch (err) {
@@ -175,27 +129,34 @@ app.post('/api/contact', async (req, res) => {
 app.post('/api/admin/login', async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log('Login attempt:', email);
         
-        // Check if admin exists, if not create default
+        // Check if admin exists
         let admin = await Admin.findOne({ email });
+        
+        // If no admin exists and credentials are correct, create one
         if (!admin && email === 'admin@esthyfav.com' && password === 'devgift1') {
             const hashedPassword = await bcrypt.hash('devgift1', 10);
-            admin = await Admin.create({ email: 'admin@esthyfav.com', password: hashedPassword, name: 'Super Admin' });
+            admin = new Admin({ email: 'admin@esthyfav.com', password: hashedPassword });
+            await admin.save();
+            console.log('✅ Admin created');
         }
         
         if (!admin) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
         
         const validPassword = await bcrypt.compare(password, admin.password);
         if (!validPassword) {
-            return res.status(401).json({ error: 'Invalid credentials' });
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
         
-        const token = jwt.sign({ id: admin._id, email: admin.email }, process.env.JWT_SECRET || 'esthyfav_secret_key', { expiresIn: '7d' });
-        res.json({ success: true, token, admin: { email: admin.email, name: admin.name } });
+        const token = jwt.sign({ id: admin._id, email: admin.email }, 'esthyfav_secret_key', { expiresIn: '7d' });
+        res.json({ success: true, token, admin: { email: admin.email } });
+        
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Login error:', err);
+        res.status(500).json({ error: 'Server error' });
     }
 });
 
@@ -211,9 +172,9 @@ app.get('/api/admin/products', verifyToken, async (req, res) => {
 
 app.post('/api/admin/products', verifyToken, upload.single('image'), async (req, res) => {
     try {
-        const { name, price, category, isBestseller, description } = req.body;
+        const { name, price, category, isBestseller } = req.body;
         const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
-        const product = new Product({ name, price, category, imageUrl, isBestseller: isBestseller === 'true', description });
+        const product = new Product({ name, price, category, imageUrl, isBestseller: isBestseller === 'true' });
         await product.save();
         res.json({ success: true, product });
     } catch (err) {
@@ -223,8 +184,8 @@ app.post('/api/admin/products', verifyToken, upload.single('image'), async (req,
 
 app.put('/api/admin/products/:id', verifyToken, upload.single('image'), async (req, res) => {
     try {
-        const { name, price, category, isBestseller, description } = req.body;
-        const updateData = { name, price, category, isBestseller: isBestseller === 'true', description };
+        const { name, price, category, isBestseller } = req.body;
+        const updateData = { name, price, category, isBestseller: isBestseller === 'true' };
         if (req.file) updateData.imageUrl = `/uploads/${req.file.filename}`;
         const product = await Product.findByIdAndUpdate(req.params.id, updateData, { new: true });
         res.json({ success: true, product });
@@ -264,18 +225,6 @@ app.post('/api/admin/categories', verifyToken, upload.single('image'), async (re
     }
 });
 
-app.put('/api/admin/categories/:id', verifyToken, upload.single('image'), async (req, res) => {
-    try {
-        const { name, slug, icon, isActive } = req.body;
-        const updateData = { name, slug, icon, isActive: isActive === 'true' };
-        if (req.file) updateData.imageUrl = `/uploads/${req.file.filename}`;
-        const category = await Category.findByIdAndUpdate(req.params.id, updateData, { new: true });
-        res.json({ success: true, category });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
 app.delete('/api/admin/categories/:id', verifyToken, async (req, res) => {
     try {
         await Category.findByIdAndDelete(req.params.id);
@@ -288,8 +237,8 @@ app.delete('/api/admin/categories/:id', verifyToken, async (req, res) => {
 // ========== ADMIN CONTACTS ==========
 app.get('/api/admin/contacts', verifyToken, async (req, res) => {
     try {
-        const messages = await ContactMessage.find().sort({ createdAt: -1 });
-        res.json(messages);
+        const contacts = await Contact.find().sort({ createdAt: -1 });
+        res.json(contacts);
     } catch (err) {
         res.json([]);
     }
@@ -297,7 +246,7 @@ app.get('/api/admin/contacts', verifyToken, async (req, res) => {
 
 app.delete('/api/admin/contacts/:id', verifyToken, async (req, res) => {
     try {
-        await ContactMessage.findByIdAndDelete(req.params.id);
+        await Contact.findByIdAndDelete(req.params.id);
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -309,10 +258,9 @@ app.get('/api/admin/stats', verifyToken, async (req, res) => {
     try {
         const products = await Product.countDocuments();
         const categories = await Category.countDocuments();
-        const messages = await ContactMessage.countDocuments();
-        const unread = await ContactMessage.countDocuments({ isRead: false });
+        const messages = await Contact.countDocuments();
         const bestsellers = await Product.countDocuments({ isBestseller: true });
-        res.json({ products, categories, messages, unread, bestsellers });
+        res.json({ products, categories, messages, unread: messages, bestsellers });
     } catch (err) {
         res.json({ products: 0, categories: 0, messages: 0, unread: 0, bestsellers: 0 });
     }
@@ -321,42 +269,41 @@ app.get('/api/admin/stats', verifyToken, async (req, res) => {
 // ========== INITIALIZE DEFAULT DATA ==========
 async function initDatabase() {
     try {
-        // Create default admin
-        const existingAdmin = await Admin.findOne({ email: 'admin@esthyfav.com' });
-        if (!existingAdmin) {
+        // Create default admin if not exists
+        const adminExists = await Admin.findOne({ email: 'admin@esthyfav.com' });
+        if (!adminExists) {
             const hashedPassword = await bcrypt.hash('devgift1', 10);
-            await Admin.create({ email: 'admin@esthyfav.com', password: hashedPassword, name: 'Super Admin' });
+            await Admin.create({ email: 'admin@esthyfav.com', password: hashedPassword });
             console.log('✅ Admin created: admin@esthyfav.com / devgift1');
         }
 
-        // Create default categories
-        const categories = [
-            { name: 'Unisex Wears', slug: 'unisex', icon: '👕' },
-            { name: 'Stylish Bags', slug: 'bags', icon: '👜' },
-            { name: 'Comfy Shoes', slug: 'shoes', icon: '👟' },
-            { name: 'Girly Essentials', slug: 'girly', icon: '🎀' },
-            { name: 'Household Items', slug: 'household', icon: '🏠' }
-        ];
-        
-        for (const cat of categories) {
-            const exists = await Category.findOne({ slug: cat.slug });
-            if (!exists) await Category.create(cat);
+        // Create default categories if none exist
+        const categoryCount = await Category.countDocuments();
+        if (categoryCount === 0) {
+            await Category.create([
+                { name: 'Unisex Wears', slug: 'unisex', icon: '👕' },
+                { name: 'Stylish Bags', slug: 'bags', icon: '👜' },
+                { name: 'Comfy Shoes', slug: 'shoes', icon: '👟' },
+                { name: 'Girly Essentials', slug: 'girly', icon: '🎀' },
+                { name: 'Household Items', slug: 'household', icon: '🏠' }
+            ]);
+            console.log('✅ Default categories created');
         }
         
-        // Add sample products
+        // Create sample products if none exist
         const productCount = await Product.countDocuments();
         if (productCount === 0) {
-            const sampleProducts = [
+            await Product.create([
                 { name: 'Premium Denim Jacket', price: '₦25,000', category: 'Unisex Wears', isBestseller: true },
                 { name: 'Leather Shoulder Bag', price: '₦35,000', category: 'Stylish Bags', isBestseller: true },
                 { name: 'Classic White Sneakers', price: '₦22,000', category: 'Comfy Shoes', isBestseller: true },
-                { name: 'Luxury Skincare Set', price: '₦15,000', category: 'Girly Essentials', isBestseller: false },
-                { name: 'Premium Cookware Set', price: '₦45,000', category: 'Household Items', isBestseller: false }
-            ];
-            await Product.insertMany(sampleProducts);
+                { name: 'Skincare Gift Set', price: '₦15,000', category: 'Girly Essentials', isBestseller: false },
+                { name: 'Kitchen Utensil Set', price: '₦12,000', category: 'Household Items', isBestseller: false }
+            ]);
+            console.log('✅ Sample products created');
         }
         
-        console.log('✅ Database initialized');
+        console.log('✅ Database initialized successfully');
     } catch (err) {
         console.log('⚠️ Database init warning:', err.message);
     }
@@ -365,11 +312,14 @@ async function initDatabase() {
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
     await initDatabase();
     console.log(`✨ Esthyfav Collection is LIVE!`);
-    console.log(`📊 Admin: https://esthyfavcollectionn.onrender.com/admin`);
-    console.log(`🔐 Email: admin@esthyfav.com | Password: devgift1`);
-    console.log(`🔄 Ping endpoint: https://esthyfavcollectionn.onrender.com/ping`);
-    console.log(`💚 Auto self-ping every 10 minutes - Server will stay awake!`);
+    console.log(`📊 Admin URL: http://localhost:${PORT}/admin`);
+    console.log(`🔐 Login: admin@esthyfav.com | Password: devgift1`);
+    
+    // Self ping every 10 minutes to keep alive on Render
+    setInterval(() => {
+        fetch(`http://localhost:${PORT}/ping`).catch(() => {});
+    }, 10 * 60 * 1000);
 });
