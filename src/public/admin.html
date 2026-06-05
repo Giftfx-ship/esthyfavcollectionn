@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esthyfav Admin | Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0A0A0A; color: #fff; }
+        
+        /* Login Page */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%);
+        }
+        .login-box {
+            background: #111;
+            padding: 50px;
+            border-radius: 24px;
+            border: 1px solid #D4AF37;
+            width: 400px;
+            text-align: center;
+        }
+        .login-box h1 { color: #D4AF37; margin-bottom: 10px; }
+        .login-box input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            background: #1A1A1A;
+            border: 1px solid #333;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 1rem;
+        }
+        .login-box button {
+            width: 100%;
+            padding: 14px;
+            background: #D4AF37;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .error-msg { color: #ff4444; margin-top: 10px; font-size: 0.9rem; }
+        
+        /* Dashboard */
+        .dashboard { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 280px;
+            background: #0D0D0D;
+            border-right: 1px solid #D4AF37;
+            padding: 30px 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .sidebar h2 { color: #D4AF37; margin-bottom: 30px; font-size: 1.3rem; }
+        .sidebar nav a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            color: #ccc;
+            text-decoration: none;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            transition: 0.3s;
+        }
+        .sidebar nav a:hover, .sidebar nav a.active { background: #D4AF37; color: #000; }
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 30px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #111;
+            padding: 25px;
+            border-radius: 16px;
+            border: 1px solid #222;
+        }
+        .stat-card h3 { color: #D4AF37; font-size: 2rem; }
+        .card {
+            background: #111;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid #222;
+        }
+        .card h3 { margin-bottom: 20px; color: #D4AF37; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #222;
+        }
+        th { color: #D4AF37; }
+        .btn-sm {
+            padding: 6px 12px;
+            background: #D4AF37;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0 3px;
+        }
+        .btn-danger { background: #ff4444; color: #fff; }
+        .btn-edit { background: #00C853; color: #fff; }
+        .product-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #111;
+            padding: 30px;
+            border-radius: 20px;
+            width: 500px;
+            border: 1px solid #D4AF37;
+        }
+        .modal-content input, .modal-content select, .modal-content textarea {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #1A1A1A;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+        }
+        .logout-btn {
+            margin-top: 30px;
+            padding: 12px;
+            background: #ff4444;
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            cursor: pointer;
+            width: 100%;
+        }
+        .add-btn {
+            background: #D4AF37;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 80px; padding: 20px 10px; }
+            .sidebar span:not(.icon) { display: none; }
+            .main-content { margin-left: 80px; }
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <h1>✦ ESTHYFAV ADMIN</h1>
+            <p style="color: #888; margin-bottom: 20px;">Login to manage your store</p>
+            <input type="email" id="loginEmail" placeholder="Email" value="admin@esthyfav.com">
+            <input type="password" id="loginPassword" placeholder="Password">
+            <button onclick="login()">Login →</button>
+            <div id="loginError" class="error-msg"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboardScreen" style="display: none;">
+        <div class="dashboard">
+            <div class="sidebar">
+                <h2>✦ ESTHYFAV</h2>
+                <nav>
+                    <a href="#" onclick="showSection('overview')" class="active" id="nav-overview"><i class="fas fa-chart-line"></i> <span>Overview</span></a>
+                    <a href="#" onclick="showSection('products')" id="nav-products"><i class="fas fa-box"></i> <span>Products</span></a>
+                    <a href="#" onclick="showSection('categories')" id="nav-categories"><i class="fas fa-tags"></i> <span>Categories</span></a>
+                    <a href="#" onclick="showSection('brand')" id="nav-brand"><i class="fas fa-palette"></i> <span>Brand Settings</span></a>
+                    <a href="#" onclick="showSection('contacts')" id="nav-contacts"><i class="fas fa-envelope"></i> <span>Messages</span></a>
+                </nav>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></button>
+            </div>
+            <div class="main-content">
+                <div class="stats-grid" id="statsGrid"></div>
+                
+                <!-- Overview -->
+                <div id="overviewSection">
+                    <div class="card">
+                        <h3>📋 Quick Actions</h3>
+                        <button class="add-btn" onclick="showSection('products')">➕ Add New Product</button>
+                        <button class="add-btn" onclick="showSection('categories')">🏷️ Manage Categories</button>
+                    </div>
+                    <div class="card">
+                        <h3>🔗 Store Links</h3>
+                        <p>🌐 Website: <a href="/" target="_blank" style="color:#D4AF37;">esthyfavcollection.com</a></p>
+                        <p>📞 WhatsApp: +234 705 898 7882</p>
+                        <p>📧 Email: famousmichelle915@gmail.com</p>
+                    </div>
+                </div>
+
+                <!-- Products -->
+                <div id="productsSection" style="display: none;">
+                    <button class="add-btn" onclick="openProductModal()">➕ Add New Product</button>
+                    <div class="card">
+                        <h3>📦 All Products</h3>
+                        <div style="overflow-x: auto;">
+                            <table id="productsTable">
+                                <thead><tr><th>Image</th><th>Name</th><th>Price</th><th>Category</th><th>Bestseller</th><th>Actions</th></tr></thead>
+                                <tbody id="productsList"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categories -->
+                <div id="categoriesSection" style="display: none;">
+                    <button class="add-btn" onclick="openCategoryModal()">➕ Add New Category</button>
+                    <div class="card">
+                        <h3>🏷️ Categories</h3>
+                        <table id="categoriesTable">
+                            <thead><tr><th>Icon</th><th>Name</th><th>Slug</th><th>Image</th><th>Actions</th></tr></thead>
+                            <tbody id="categoriesList"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Brand Settings -->
+                <div id="brandSection" style="display: none;">
+                    <div class="card">
+                        <h3>🖼️ Hero Banner Image</h3>
+                        <input type="file" id="heroImageFile" accept="image/*">
+                        <button onclick="updateBrandSetting('hero_image')">Upload Hero Image</button>
+                    </div>
+                    <div class="card">
+                        <h3>🏷️ Logo</h3>
+                        <input type="file" id="logoFile" accept="image/*">
+                        <button onclick="updateBrandSetting('logo')">Upload Logo</button>
+                    </div>
+                    <div class="card">
+                        <h3>📞 Contact Phone</h3>
+                        <input type="text" id="contact_phone" placeholder="Phone Number">
+                        <button onclick="updateBrandSettingText('contact_phone')">Save Phone</button>
+                    </div>
+                </div>
+
+                <!-- Contacts -->
+                <div id="contactsSection" style="display: none;">
+                    <div class="card">
+                        <h3>📧 Contact Messages</h3>
+                        <table id="contactsTable">
+                            <thead><tr><th>Date</th><th>Name</th><th>Email</th><th>Message</th><th>Status</th></tr></thead>
+                            <tbody id="contactsList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Product Modal -->
+<div id="productModal" class="modal">
+    <div class="modal-content">
+        <h3 id="productModalTitle">Add Product</h3>
+        <input type="hidden" id="productId">
+        <input type="text" id="productName" placeholder="Product Name">
+        <input type="text" id="productPrice" placeholder="Price (e.g., ₦25,000)">
+        <select id="productCategory">
+            <option>Unisex Wears</option><option>Stylish Bags</option><option>Comfy Shoes</option>
+            <option>Girly Essentials</option><option>Household Items</option>
+        </select>
+        <textarea id="productDescription" placeholder="Description" rows="3"></textarea>
+        <label><input type="checkbox" id="productBestseller"> Mark as Bestseller</label>
+        <input type="file" id="productImage" accept="image/*">
+        <button onclick="saveProduct()">Save Product</button>
+        <button onclick="closeModal('productModal')" style="background:#333;">Cancel</button>
+    </div>
+</div>
+
+<!-- Category Modal -->
+<div id="categoryModal" class="modal">
+    <div class="modal-content">
+        <h3 id="categoryModalTitle">Add Category</h3>
+        <input type="hidden" id="categoryId">
+        <input type="text" id="categoryName" placeholder="Category Name">
+        <input type="text" id="categorySlug" placeholder="slug (e.g., unisex-wears)">
+        <input type="text" id="categoryIcon" placeholder="Icon (e.g., 👕)">
+        <input type="file" id="categoryImage" accept="image/*">
+        <button onclick="saveCategory()">Save Category</button>
+        <button onclick="closeModal('categoryModal')" style="background:#333;">Cancel</button>
+    </div>
+</div>
+
+<script>
+    let token = localStorage.getItem('adminToken');
+    const API_URL = 'http://localhost:3000/api';
+    
+    if (token) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboardScreen').style.display = 'block';
+        loadStats();
+        loadProducts();
+        loadCategories();
+        loadContacts();
+    }
+    
+    async function login() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        
+        try {
+            const res = await fetch(`${API_URL}/admin/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (data.token) {
+                token = data.token;
+                localStorage.setItem('adminToken', token);
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboardScreen').style.display = 'block';
+                loadStats();
+                loadProducts();
+                loadCategories();
+                loadContacts();
+            } else {
+                document.getElementById('loginError').innerText = data.error || 'Login failed';
+            }
+        } catch (err) {
+            document.getElementById('loginError').innerText = 'Connection error';
+        }
+    }
+    
+    function logout() {
+        localStorage.removeItem('adminToken');
+        token = null;
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('dashboardScreen').style.display = 'none';
+    }
+    
+    function showSection(section) {
+        const sections = ['overview', 'products', 'categories', 'brand', 'contacts'];
+        sections.forEach(s => {
+            document.getElementById(`${s}Section`).style.display = 'none';
+            const nav = document.getElementById(`nav-${s}`);
+            if (nav) nav.classList.remove('active');
+        });
+        document.getElementById(`${section}Section`).style.display = 'block';
+        const activeNav = document.getElementById(`nav-${section}`);
+        if (activeNav) activeNav.classList.add('active');
+        
+        if (section === 'products') loadProducts();
+        if (section === 'categories') loadCategories();
+        if (section === 'contacts') loadContacts();
+        if (section === 'overview') loadStats();
+    }
+    
+    async function loadStats() {
+        try {
+            const res = await fetch(`${API_URL}/admin/stats`, { headers: { 'Authorization': token } });
+            const stats = await res.json();
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card"><h3>${stats.products}</h3><p>Total Products</p></div>
+                <div class="stat-card"><h3>${stats.categories}</h3><p>Categories</p></div>
+                <div class="stat-card"><h3>${stats.bestsellers}</h3><p>Bestsellers</p></div>
+                <div class="stat-card"><h3>${stats.unread}</h3><p>Unread Messages</p></div>
+            `;
+        } catch (err) { console.error(err); }
+    }
+    
+    async function loadProducts() {
+        try {
+            const res = await fetch(`${API_URL}/admin/products`, { headers: { 'Authorization': token } });
+            const products = await res.json();
+            document.getElementById('productsList').innerHTML = products.map(p => `
+                <tr>
+                    <td>${p.imageUrl ? `<img src="${p.imageUrl}" class="product-img">` : 'No img'}</td>
+                    <td>${p.name}</td>
+                    <td>${p.price}</td>
+                    <td>${p.category}</td>
+                    <td>${p.isBestseller ? '⭐ Yes' : 'No'}</td>
+                    <td>
+                        <button class="btn-sm btn-edit" onclick="editProduct('${p._id}')">Edit</button>
+                        <button class="btn-sm btn-danger" onclick="deleteProduct('${p._id}')">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (err) { console.error(err); }
+    }
+    
+    function openProductModal(product = null) {
+        document.getElementById('productModal').style.display = 'flex';
+        if (product) {
+            document.getElementById('productModalTitle').innerText = 'Edit Product';
+            document.getElementById('productId').value = product._id;
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productPrice').value = product.price;
+            document.getElementById('productCategory').value = product.category;
+            document.getElementById('productDescription').value = product.description || '';
+            document.getElementById('productBestseller').checked = product.isBestseller;
+        } else {
+            document.getElementById('productModalTitle').innerText = 'Add Product';
+            document.getElementById('productId').value = '';
+            document.getElementById('productName').value = '';
+            document.getElementById('productPrice').value = '';
+            document.getElementById('productCategory').value = 'Unisex Wears';
+            document.getElementById('productDescription').value = '';
+            document.getElementById('productBestseller').checked = false;
+        }
+    }
+    
+    async function saveProduct() {
+        const id = document.getElementById('productId').value;
+        const formData = new FormData();
+        formData.append('name', document.getElementById('productName').value);
+        formData.append('price', document.getElementById('productPrice').value);
+        formData.append('category', document.getElementById('productCategory').value);
+        formData.append('description', document.getElementById('productDescription').value);
+        formData.append('isBestseller', document.getElementById('productBestseller').checked);
+        const imageFile = document.getElementById('productImage').files[0];
+        if (imageFile) formData.append('image', imageFile);
+        
+        const url = id ? `${API_URL}/admin/products/${id}` : `${API_URL}/admin/products`;
+        const method = id ? 'PUT' : 'POST';
+        
+        await fetch(url, { method, headers: { 'Authorization': token }, body: formData });
+        closeModal('productModal');
+        loadProducts();
+        loadStats();
+    }
+    
+    async function editProduct(id) {
+        const res = await fetch(`${API_URL}/admin/products`, { headers: { 'Authorization': token } });
+        const products = await res.json();
+        const product = products.find(p => p._id === id);
+        openProductModal(product);
+    }
+    
+    async function deleteProduct(id) {
+        if (confirm('Delete this product?')) {
+            await fetch(`${API_URL}/admin/products/${id}`, { method: 'DELETE', headers: { 'Authorization': token } });
+            loadProducts();
+            loadStats();
+        }
+    }
+    
+    async function loadCategories() {
+        const res = await fetch(`${API_URL}/admin/categories`, { headers: { 'Authorization': token } });
+        const categories = await res.json();
+        document.getElementById('categoriesList').innerHTML = categories.map(c => `
+            <tr>
+                <td>${c.icon || '📦'}</td>
+                <td>${c.name}</td>
+                <td>${c.slug}</td>
+                <td>${c.imageUrl ? `<img src="${c.imageUrl}" class="product-img">` : 'No image'}</td>
+                <td>
+                    <button class="btn-sm btn-edit" onclick="editCategory('${c._id}')">Edit</button>
+                    <button class="btn-sm btn-danger" onclick="deleteCategory('${c._id}')">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+    
+    function openCategoryModal(category = null) {
+        document.getElementById('categoryModal').style.display = 'flex';
+        if (category) {
+            document.getElementById('categoryModalTitle').innerText = 'Edit Category';
+            document.getElementById('categoryId').value = category._id;
+            document.getElementById('categoryName').value = category.name;
+            document.getElementById('categorySlug').value = category.slug;
+            document.getElementById('categoryIcon').value = category.icon || '';
+        } else {
+            document.getElementById('categoryModalTitle').innerText = 'Add Category';
+            document.getElementById('categoryId').value = '';
+            document.getElementById('categoryName').value = '';
+            document.getElementById('categorySlug').value = '';
+            document.getElementById('categoryIcon').value = '';
+        }
+    }
+    
+    async function saveCategory() {
+        const id = document.getElementById('categoryId').value;
+        const formData = new FormData();
+        formData.append('name', document.getElementById('categoryName').value);
+        formData.append('slug', document.getElementById('categorySlug').value);
+        formData.append('icon', document.getElementById('categoryIcon').value);
+        const imageFile = document.getElementById('categoryImage').files[0];
+        if (imageFile) formData.append('image', imageFile);
+        
+        const url = id ? `${API_URL}/admin/categories/${id}` : `${API_URL}/admin/categories`;
+        const method = id ? 'PUT' : 'POST';
+        
+        await fetch(url, { method, headers: { 'Authorization': token }, body: formData });
+        closeModal('categoryModal');
+        loadCategories();
+        loadStats();
+    }
+    
+    async function editCategory(id) {
+        const res = await fetch(`${API_URL}/admin/categories`, { headers: { 'Authorization': token } });
+        const categories = await res.json();
+        const category = categories.find(c => c._id === id);
+        openCategoryModal(category);
+    }
+    
+    async function deleteCategory(id) {
+        if (confirm('Delete this category?')) {
+            await fetch(`${API_URL}/admin/categories/${id}`, { method: 'DELETE', headers: { 'Authorization': token } });
+            loadCategories();
+            loadStats();
+        }
+    }
+    
+    async function loadContacts() {
+        const res = await fetch(`${API_URL}/admin/contacts`, { headers: { 'Authorization': token } });
+        const contacts = await res.json();
+        document.getElementById('contactsList').innerHTML = contacts.map(c => `
+            <tr style="${c.isRead ? 'opacity:0.6' : ''}">
+                <td>${new Date(c.createdAt).toLocaleDateString()}</td>
+                <td>${c.name}</td>
+                <td>${c.email}</td>
+                <td>${c.message.substring(0, 50)}...</td>
+                <td>${c.isRead ? '✓ Read' : '🆕 New'}</td>
+            </tr>
+        `).join('');
+    }
+    
+    async function updateBrandSetting(key) {
+        const fileInput = document.getElementById(`${key}File`);
+        if (fileInput && fileInput.files[0]) {
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+            await fetch(`${API_URL}/admin/brand-settings/${key}`, { method: 'PUT', headers: { 'Authorization': token }, body: formData });
+            alert(`${key} updated!`);
+        }
+    }
+    
+    async function updateBrandSettingText(key) {
+        const value = document.getElementById(key).value;
+        await fetch(`${API_URL}/admin/brand-settings/${key}`, { method: 'PUT', headers: { 'Authorization': token, 'Content-Type': 'application/json' }, body: JSON.stringify({ value }) });
+        alert(`${key} saved!`);
+    }
+    
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+    
+    // Check if already logged in
+    if (token) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboardScreen').style.display = 'block';
+        loadStats();
+        loadProducts();
+        loadCategories();
+        loadContacts();
+    }
+</script>
+</body>
+</html>
