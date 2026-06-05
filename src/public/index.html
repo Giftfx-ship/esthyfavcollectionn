@@ -21,10 +21,32 @@
             --bg-footer: #050505;
             --text-primary: #FFFFFF;
             --text-secondary: #B0B0B0;
+            --text-muted: #6B6B6B;
             --accent: #D4AF37;
             --accent-dark: #B8960F;
             --accent-glow: rgba(212, 175, 55, 0.15);
             --border-color: rgba(212, 175, 55, 0.2);
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.3);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.4);
+            --shadow-lg: 0 16px 48px rgba(0,0,0,0.5);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #F8F9FA;
+            --bg-secondary: #FFFFFF;
+            --bg-card: #FFFFFF;
+            --bg-footer: #E9ECEF;
+            --text-primary: #111111;
+            --text-secondary: #555555;
+            --text-muted: #888888;
+            --accent: #B8860B;
+            --accent-dark: #9A7209;
+            --accent-glow: rgba(184, 134, 11, 0.08);
+            --border-color: rgba(184, 134, 11, 0.2);
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.12);
+            --shadow-lg: 0 16px 48px rgba(0,0,0,0.16);
         }
 
         body {
@@ -33,10 +55,11 @@
             color: var(--text-primary);
             scroll-behavior: smooth;
             overflow-x: hidden;
+            transition: var(--transition);
         }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-secondary); }
         ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
 
@@ -56,13 +79,14 @@
             transition: opacity 0.6s ease, visibility 0.6s ease;
         }
         .loading-logo {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 800;
             background: linear-gradient(135deg, var(--accent) 0%, #FFF 100%);
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 20px;
+            animation: fadeInUp 0.8s ease;
         }
         .loading-spinner {
             width: 50px;
@@ -73,38 +97,82 @@
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         /* Navigation */
         .navbar {
             position: fixed;
             top: 0;
             width: 100%;
-            padding: 20px 40px;
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(10px);
+            padding: 18px 40px;
+            background: rgba(var(--bg-primary-rgb), 0.95);
+            backdrop-filter: blur(12px);
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
             border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
         }
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 800;
+            letter-spacing: -0.5px;
             background: linear-gradient(135deg, var(--accent) 0%, var(--text-primary) 100%);
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             cursor: pointer;
         }
-        .nav-links { display: flex; gap: 30px; align-items: center; }
+        .logo i { 
+            background: none;
+            -webkit-text-fill-color: var(--accent);
+            margin-right: 5px;
+        }
+        .nav-links { display: flex; gap: 35px; align-items: center; }
         .nav-links a {
             color: var(--text-primary);
             text-decoration: none;
             font-weight: 500;
-            transition: 0.3s;
+            transition: var(--transition);
+            position: relative;
         }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: var(--transition);
+        }
+        .nav-links a:hover::after { width: 100%; }
         .nav-links a:hover { color: var(--accent); }
+        
+        /* Theme Toggle */
+        .theme-toggle {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+        .theme-toggle i { font-size: 1rem; }
+        
         .mobile-menu { display: none; font-size: 1.5rem; cursor: pointer; }
 
         /* Hero Section */
@@ -132,23 +200,31 @@
             position: relative;
             z-index: 2;
             padding: 100px 20px;
+            animation: fadeInUp 1s ease;
         }
         .hero-badge {
             display: inline-block;
-            padding: 6px 16px;
+            padding: 8px 20px;
             background: var(--accent-glow);
             border: 1px solid var(--accent);
             border-radius: 50px;
             font-size: 0.8rem;
             color: var(--accent);
             margin-bottom: 25px;
+            backdrop-filter: blur(4px);
         }
         .hero h1 {
             font-size: clamp(2.5rem, 8vw, 5rem);
             font-weight: 800;
             margin-bottom: 20px;
+            line-height: 1.1;
         }
-        .gold-text { color: var(--accent); }
+        .gold-text { 
+            background: linear-gradient(135deg, var(--accent) 0%, #FFD700 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
         .hero p {
             color: var(--text-secondary);
             font-size: 1.2rem;
@@ -156,6 +232,7 @@
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
+            line-height: 1.6;
         }
         .btn-group { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
         .btn {
@@ -164,7 +241,7 @@
             font-weight: 600;
             text-decoration: none;
             display: inline-block;
-            transition: 0.3s;
+            transition: var(--transition);
             cursor: pointer;
             border: none;
             font-size: 1rem;
@@ -172,10 +249,11 @@
         .btn-primary {
             background: var(--accent);
             color: #000;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
         }
         .btn-primary:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
         }
         .btn-outline {
             border: 2px solid var(--accent);
@@ -190,20 +268,20 @@
         .hero-stats {
             display: flex;
             justify-content: center;
-            gap: 40px;
-            margin-top: 50px;
+            gap: 50px;
+            margin-top: 60px;
             flex-wrap: wrap;
         }
         .stat-item { text-align: center; }
         .stat-number {
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 800;
             color: var(--accent);
         }
-        .stat-label { font-size: 0.8rem; color: var(--text-secondary); }
+        .stat-label { font-size: 0.85rem; color: var(--text-secondary); letter-spacing: 0.5px; }
 
         /* Sections */
-        .section { padding: 80px 20px; }
+        .section { padding: 100px 20px; }
         .container { max-width: 1200px; margin: 0 auto; }
         .section-title {
             text-align: center;
@@ -215,11 +293,12 @@
             text-align: center;
             color: var(--text-secondary);
             margin-bottom: 50px;
+            font-size: 1rem;
         }
         .section-divider {
             width: 60px;
             height: 3px;
-            background: var(--accent);
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
             margin: 20px auto 0;
         }
 
@@ -227,65 +306,71 @@
         .category-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 25px;
+            gap: 30px;
             margin-top: 50px;
         }
         .category-card {
             background: var(--bg-card);
-            border-radius: 20px;
-            padding: 30px 20px;
+            border-radius: 24px;
+            padding: 35px 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition);
             border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
         }
         .category-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-10px);
             border-color: var(--accent);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: var(--shadow-lg);
         }
-        .category-icon { font-size: 3rem; margin-bottom: 15px; }
-        .category-card h3 { margin-bottom: 8px; }
-        .category-card p { color: var(--accent); font-size: 0.9rem; }
+        .category-icon { font-size: 3rem; margin-bottom: 15px; display: block; }
+        .category-card h3 { margin-bottom: 8px; font-size: 1.2rem; }
+        .category-card p { color: var(--accent); font-size: 0.85rem; font-weight: 500; }
 
         /* Products Grid */
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
             margin-top: 50px;
         }
         .product-card {
             background: var(--bg-card);
-            border-radius: 16px;
+            border-radius: 20px;
             overflow: hidden;
-            transition: all 0.3s;
+            transition: var(--transition);
             border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
         }
         .product-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
             border-color: var(--accent);
+            box-shadow: var(--shadow-lg);
         }
         .product-image {
-            height: 260px;
-            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            height: 280px;
             background-size: cover;
             background-position: center;
             position: relative;
+            transition: transform 0.5s ease;
         }
+        .product-card:hover .product-image { transform: scale(1.05); }
+        .product-image-wrapper { overflow: hidden; }
         .bestseller-badge {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 12px;
+            left: 12px;
             background: var(--accent);
             color: #000;
-            padding: 4px 10px;
+            padding: 5px 12px;
             border-radius: 50px;
             font-size: 0.7rem;
             font-weight: 700;
+            z-index: 2;
         }
         .product-info { padding: 20px; }
-        .product-info h4 { margin-bottom: 8px; font-size: 1.1rem; }
+        .product-info h4 { margin-bottom: 8px; font-size: 1rem; font-weight: 600; }
         .product-price {
             color: var(--accent);
             font-weight: 700;
@@ -294,14 +379,18 @@
         }
         .product-whatsapp {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background: #25D366;
             color: #fff;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             cursor: pointer;
             font-weight: 600;
-            transition: 0.3s;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         .product-whatsapp:hover {
             background: #128C7E;
@@ -311,114 +400,169 @@
         /* Features Grid */
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 30px;
             margin-top: 50px;
         }
         .feature-card {
             text-align: center;
-            padding: 30px;
+            padding: 35px 25px;
             background: var(--bg-card);
-            border-radius: 16px;
+            border-radius: 20px;
             border: 1px solid var(--border-color);
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
         }
-        .feature-icon { font-size: 2.5rem; color: var(--accent); margin-bottom: 15px; }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+        .feature-icon { font-size: 2.5rem; color: var(--accent); margin-bottom: 20px; }
 
         /* CTA Section */
         .cta-section {
             background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
             border-radius: 30px;
-            padding: 60px 40px;
+            padding: 70px 40px;
             text-align: center;
             margin: 40px 20px;
             border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
         }
 
-        /* Contact Form */
+        /* Contact Section - Enhanced */
         .contact-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 40px;
             margin-top: 50px;
         }
-        .contact-info { background: var(--bg-card); padding: 35px; border-radius: 20px; }
+        .contact-info { 
+            background: var(--bg-card); 
+            padding: 40px; 
+            border-radius: 28px; 
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+        .contact-info h3 { margin-bottom: 30px; font-size: 1.5rem; }
         .contact-item {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 18px;
+            margin-bottom: 28px;
             padding: 12px;
-            border-radius: 12px;
+            border-radius: 16px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .contact-item:hover {
+            background: var(--accent-glow);
+            transform: translateX(5px);
         }
         .contact-icon {
-            width: 50px;
-            height: 50px;
+            width: 55px;
+            height: 55px;
             background: var(--accent-glow);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
+            font-size: 1.4rem;
             color: var(--accent);
         }
-        .contact-form { background: var(--bg-card); padding: 35px; border-radius: 20px; }
+        .contact-details h4 { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px; letter-spacing: 0.5px; }
+        .contact-details p, .contact-details a { 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            color: var(--text-primary); 
+            text-decoration: none;
+        }
+        .contact-details a:hover { color: var(--accent); }
+        
+        .contact-form { 
+            background: var(--bg-card); 
+            padding: 40px; 
+            border-radius: 28px; 
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+        .contact-form h3 { margin-bottom: 25px; font-size: 1.5rem; }
         .form-group { margin-bottom: 20px; }
         .form-group input, .form-group textarea {
             width: 100%;
-            padding: 14px;
+            padding: 15px 18px;
             background: var(--bg-primary);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border-radius: 14px;
             color: var(--text-primary);
             font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+            font-size: 0.95rem;
         }
         .form-group input:focus, .form-group textarea:focus {
             outline: none;
             border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
         }
+        .form-group textarea { resize: vertical; min-height: 120px; }
 
         /* Footer */
         .footer {
             background: var(--bg-footer);
-            padding: 60px 20px 30px;
-            margin-top: 60px;
+            padding: 70px 20px 30px;
+            margin-top: 80px;
             border-top: 1px solid var(--border-color);
         }
         .footer-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 50px;
             max-width: 1200px;
             margin: 0 auto;
         }
-        .footer-col h4 { color: var(--accent); margin-bottom: 20px; }
+        .footer-col h4 { 
+            color: var(--accent); 
+            margin-bottom: 20px; 
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
         .footer-col p, .footer-col a {
             color: var(--text-secondary);
             text-decoration: none;
-            line-height: 1.8;
+            line-height: 1.9;
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            transition: var(--transition);
+            font-size: 0.9rem;
         }
-        .footer-col a:hover { color: var(--accent); }
+        .footer-col a:hover { color: var(--accent); transform: translateX(5px); }
         .social-links { display: flex; gap: 15px; margin-top: 20px; }
         .social-links a {
-            width: 38px;
-            height: 38px;
+            width: 42px;
+            height: 42px;
             background: var(--bg-card);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
         }
+        .social-links a:hover {
+            background: var(--accent);
+            transform: translateY(-5px);
+        }
+        .social-links a:hover i { color: #000; }
+        .social-links a i { color: var(--accent); font-size: 1.2rem; transition: var(--transition); }
         .footer-bottom {
             text-align: center;
-            padding-top: 40px;
-            margin-top: 40px;
+            padding-top: 50px;
+            margin-top: 50px;
             border-top: 1px solid var(--border-color);
             color: var(--text-secondary);
             font-size: 0.8rem;
         }
-        .dev-credit { color: var(--accent); font-weight: 600; }
+        .dev-credit { color: var(--accent); font-weight: 600; cursor: pointer; }
 
         /* Toast */
         .toast {
@@ -428,22 +572,52 @@
             transform: translateX(-50%) translateY(100px);
             background: var(--accent);
             color: #000;
-            padding: 12px 24px;
+            padding: 14px 28px;
             border-radius: 50px;
             font-weight: 600;
             z-index: 1100;
             transition: transform 0.3s;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* Floating WhatsApp */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #25D366;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+            transition: var(--transition);
+        }
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(37, 211, 102, 0.6);
+        }
+        .whatsapp-float i { font-size: 2rem; color: #fff; }
 
         /* Responsive */
         @media (max-width: 768px) {
             .navbar { padding: 15px 20px; }
             .nav-links { display: none; }
             .mobile-menu { display: block; }
-            .hero-stats { gap: 20px; }
-            .section { padding: 50px 15px; }
+            .hero-stats { gap: 25px; }
+            .section { padding: 60px 15px; }
             .cta-section { padding: 40px 20px; margin: 20px; }
+            .contact-info, .contact-form { padding: 25px; }
+            .whatsapp-float { width: 50px; height: 50px; bottom: 20px; right: 20px; }
+            .whatsapp-float i { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -451,45 +625,54 @@
 
 <!-- Loading Screen -->
 <div class="loading-screen" id="loadingScreen">
-    <div class="loading-logo">ESTHYFAV</div>
+    <div class="loading-logo">✦ ESTHYFAV ✦</div>
     <div class="loading-spinner"></div>
-    <div class="loading-text" style="margin-top: 20px; color: #888;">Loading luxury collection...</div>
+    <div class="loading-text" style="margin-top: 20px; color: var(--text-muted);">curating excellence...</div>
 </div>
 
 <!-- Toast -->
-<div class="toast" id="toast">✨ Welcome to Esthyfav</div>
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span>Welcome to Esthyfav</span></div>
+
+<!-- Floating WhatsApp -->
+<div class="whatsapp-float" onclick="window.open('https://wa.me/2347058987882', '_blank')">
+    <i class="fab fa-whatsapp"></i>
+</div>
 
 <!-- Navigation -->
 <nav class="navbar">
-    <div class="logo">ESTHYFAV ✦ COLLECTION</div>
+    <div class="logo"><i class="fas fa-crown"></i> ESTHYFAV ✦ COLLECTION</div>
     <div class="nav-links">
         <a href="#home">Home</a>
         <a href="#categories">Shop</a>
         <a href="#products">Products</a>
         <a href="#contact">Contact</a>
-        <a href="https://wa.me/2347058987882" class="btn-outline" style="padding: 8px 20px;">📞 WhatsApp</a>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fas fa-sun" id="themeIcon"></i>
+            <span id="themeText">Light</span>
+        </button>
+        <a href="https://wa.me/2347058987882" class="btn-outline" style="padding: 8px 22px;">📞 WhatsApp</a>
     </div>
-    <div class="mobile-menu" id="mobileMenu">☰</div>
+    <div class="mobile-menu" id="mobileMenu"><i class="fas fa-bars"></i></div>
 </nav>
 
 <!-- Hero Section -->
 <section class="hero" id="home">
     <div class="hero-bg-effect"></div>
     <div class="hero-content">
-        <span class="hero-badge">✦ Premium Quality Since 2024 ✦</span>
+        <span class="hero-badge"><i class="fas fa-gem"></i> Since 2024 <i class="fas fa-gem"></i></span>
         <h1>
             <span class="gold-text">ESTHYFAV</span><br>
             COLLECTION
         </h1>
-        <p>Your one-stop destination for trendy unisex wears, stylish bags,<br> comfy shoes, girly essentials, and quality household items.</p>
+        <p>Your premier destination for curated fashion, accessories, and home essentials.<br>Where style meets affordability.</p>
         <div class="btn-group">
-            <a href="#products" class="btn btn-primary">🛒 Shop Now</a>
-            <a href="https://wa.me/2347058987882" class="btn btn-outline">📞 Order on WhatsApp</a>
+            <a href="#products" class="btn btn-primary"><i class="fas fa-shopping-bag"></i> Shop Now</a>
+            <a href="https://wa.me/2347058987882" class="btn btn-outline"><i class="fab fa-whatsapp"></i> Order on WhatsApp</a>
         </div>
         <div class="hero-stats">
             <div class="stat-item"><div class="stat-number" id="statProducts">500+</div><div class="stat-label">Happy Customers</div></div>
-            <div class="stat-item"><div class="stat-number" id="statCategories">5</div><div class="stat-label">Categories</div></div>
-            <div class="stat-item"><div class="stat-number">24/7</div><div class="stat-label">Support</div></div>
+            <div class="stat-item"><div class="stat-number" id="statCategories">5</div><div class="stat-label">Product Categories</div></div>
+            <div class="stat-item"><div class="stat-number">24/7</div><div class="stat-label">Customer Support</div></div>
         </div>
     </div>
 </section>
@@ -498,7 +681,7 @@
 <section class="section" id="categories">
     <div class="container">
         <h2 class="section-title">Shop by Category</h2>
-        <p class="section-subtitle">Find exactly what you're looking for</p>
+        <p class="section-subtitle">Explore our curated collections</p>
         <div class="section-divider"></div>
         <div class="category-grid" id="categoriesGrid">
             <div class="category-card"><div class="category-icon">👕</div><h3>Unisex Wears</h3><p>Streetwear & Comfort</p></div>
@@ -513,7 +696,7 @@
 <!-- Bestsellers Section -->
 <section class="section" id="products">
     <div class="container">
-        <h2 class="section-title">🔥 Bestsellers</h2>
+        <h2 class="section-title"><i class="fas fa-fire"></i> Bestsellers</h2>
         <p class="section-subtitle">What everyone's buying right now</p>
         <div class="section-divider"></div>
         <div class="products-grid" id="productsGrid">
@@ -528,45 +711,67 @@
         <h2 class="section-title">Why Choose Esthyfav?</h2>
         <div class="section-divider"></div>
         <div class="features-grid">
-            <div class="feature-card"><div class="feature-icon">💰</div><h4>Affordable Prices</h4><p>Premium quality without breaking the bank</p></div>
-            <div class="feature-card"><div class="feature-icon">✅</div><h4>Quality Guaranteed</h4><p>Every product inspected before shipping</p></div>
-            <div class="feature-card"><div class="feature-icon">🚚</div><h4>Fast Delivery</h4><p>Nationwide shipping with tracking</p></div>
-            <div class="feature-card"><div class="feature-icon">💬</div><h4>24/7 Support</h4><p>We reply within minutes</p></div>
+            <div class="feature-card"><div class="feature-icon"><i class="fas fa-tag"></i></div><h4>Best Prices</h4><p>Premium quality at affordable rates</p></div>
+            <div class="feature-card"><div class="feature-icon"><i class="fas fa-check-circle"></i></div><h4>Quality Assured</h4><p>Every product carefully inspected</p></div>
+            <div class="feature-card"><div class="feature-icon"><i class="fas fa-truck-fast"></i></div><h4>Fast Delivery</h4><p>Nationwide shipping with tracking</p></div>
+            <div class="feature-card"><div class="feature-icon"><i class="fas fa-headset"></i></div><h4>24/7 Support</h4><p>We're always here to help</p></div>
         </div>
     </div>
 </section>
 
 <!-- CTA Section -->
 <div class="cta-section">
-    <h2>Ready to elevate your style?</h2>
-    <p style="margin-top: 15px; color: var(--text-secondary);">Shop now and get free delivery on orders over ₦50,000</p>
+    <h2><i class="fas fa-gift"></i> Ready to elevate your style?</h2>
+    <p style="margin-top: 15px; color: var(--text-secondary);">Shop now and enjoy free delivery on orders over ₦50,000</p>
     <div class="btn-group" style="margin-top: 30px;">
-        <a href="https://wa.me/2347058987882" class="btn btn-primary">Order via WhatsApp →</a>
+        <a href="https://wa.me/2347058987882" class="btn btn-primary"><i class="fab fa-whatsapp"></i> Order via WhatsApp →</a>
     </div>
 </div>
 
-<!-- Contact Section -->
+<!-- Contact Section - Enhanced -->
 <section class="section" id="contact">
     <div class="container">
         <h2 class="section-title">Get in Touch</h2>
+        <p class="section-subtitle">We'd love to hear from you</p>
         <div class="section-divider"></div>
         <div class="contact-grid">
             <div class="contact-info">
-                <div class="contact-item"><div class="contact-icon"><i class="fas fa-phone"></i></div><div><h4>Call Us</h4><p>+234 705 898 7882</p></div></div>
-                <div class="contact-item"><div class="contact-icon"><i class="fab fa-whatsapp"></i></div><div><h4>WhatsApp</h4><p>+234 705 898 7882</p></div></div>
-                <div class="contact-item"><div class="contact-icon"><i class="fas fa-envelope"></i></div><div><h4>Email</h4><p>famousmichelle915@gmail.com</p></div></div>
-                <div class="contact-item"><div class="contact-icon"><i class="fas fa-clock"></i></div><div><h4>Response Time</h4><p>Within 24 hours</p></div></div>
+                <h3><i class="fas fa-comments"></i> Connect With Us</h3>
+                <div class="contact-item" onclick="window.location.href='tel:+2347058987882'">
+                    <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+                    <div class="contact-details"><h4>CALL US</h4><p>+234 705 898 7882</p></div>
+                </div>
+                <div class="contact-item" onclick="window.open('https://wa.me/2347058987882', '_blank')">
+                    <div class="contact-icon"><i class="fab fa-whatsapp"></i></div>
+                    <div class="contact-details"><h4>WHATSAPP</h4><p>+234 705 898 7882</p></div>
+                </div>
+                <div class="contact-item" onclick="window.location.href='mailto:famousmichelle915@gmail.com'">
+                    <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                    <div class="contact-details"><h4>EMAIL US</h4><p>famousmichelle915@gmail.com</p></div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-clock"></i></div>
+                    <div class="contact-details"><h4>RESPONSE TIME</h4><p>Within 24 hours</p></div>
+                </div>
             </div>
             <div class="contact-form">
-                <h3 style="margin-bottom: 20px;">Send us a message</h3>
+                <h3><i class="fas fa-paper-plane"></i> Send a Message</h3>
                 <form id="contactForm">
-                    <div class="form-group"><input type="text" id="contactName" placeholder="Your Name" required></div>
-                    <div class="form-group"><input type="email" id="contactEmail" placeholder="Your Email" required></div>
-                    <div class="form-group"><input type="tel" id="contactPhone" placeholder="Your Phone (optional)"></div>
-                    <div class="form-group"><textarea id="contactMessage" placeholder="Your Message" rows="4" required></textarea></div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">Send Message →</button>
+                    <div class="form-group">
+                        <input type="text" id="contactName" placeholder="Your full name" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="contactEmail" placeholder="Your email address" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" id="contactPhone" placeholder="Your phone number (optional)">
+                    </div>
+                    <div class="form-group">
+                        <textarea id="contactMessage" placeholder="Tell us what you're looking for..." rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fas fa-paper-plane"></i> Send Message →</button>
                 </form>
-                <div id="formStatus" style="margin-top: 15px; text-align: center;"></div>
+                <div id="formStatus" style="margin-top: 18px; text-align: center; font-size: 0.9rem;"></div>
             </div>
         </div>
     </div>
@@ -575,21 +780,76 @@
 <!-- Footer -->
 <footer class="footer">
     <div class="footer-grid">
-        <div class="footer-col"><h4>ESTHYFAV COLLECTION</h4><p>Your one-stop shop for style & home essentials. Quality products at affordable prices.</p></div>
-        <div class="footer-col"><h4>Quick Links</h4><a href="#home">Home</a><a href="#products">Shop</a><a href="#contact">Contact</a></div>
-        <div class="footer-col"><h4>Contact Info</h4><p><i class="fas fa-phone"></i> +234 705 898 7882</p><p><i class="fab fa-whatsapp"></i> WhatsApp: +234 705 898 7882</p><p><i class="fas fa-envelope"></i> famousmichelle915@gmail.com</p></div>
-        <div class="footer-col"><h4>Follow Us</h4><div class="social-links"><a href="#"><i class="fab fa-instagram"></i></a><a href="#"><i class="fab fa-facebook"></i></a><a href="https://wa.me/2347058987882"><i class="fab fa-whatsapp"></i></a></div></div>
+        <div class="footer-col">
+            <h4><i class="fas fa-crown"></i> ESTHYFAV</h4>
+            <p>Your one-stop destination for premium fashion, accessories, and home essentials. Quality you can trust, prices you'll love.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Quick Links</h4>
+            <a href="#home"><i class="fas fa-chevron-right"></i> Home</a>
+            <a href="#products"><i class="fas fa-chevron-right"></i> Shop</a>
+            <a href="#contact"><i class="fas fa-chevron-right"></i> Contact</a>
+        </div>
+        <div class="footer-col">
+            <h4>Contact Info</h4>
+            <p><i class="fas fa-phone"></i> +234 705 898 7882</p>
+            <p><i class="fab fa-whatsapp"></i> WhatsApp: +234 705 898 7882</p>
+            <p><i class="fas fa-envelope"></i> famousmichelle915@gmail.com</p>
+        </div>
+        <div class="footer-col">
+            <h4>Follow Us</h4>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://wa.me/2347058987882"><i class="fab fa-whatsapp"></i></a>
+                <a href="#"><i class="fab fa-tiktok"></i></a>
+            </div>
+        </div>
     </div>
     <div class="footer-bottom">
-        <p>&copy; 2024 Esthyfav Collection. All rights reserved.</p>
-        <p style="margin-top: 10px;">🧑‍💻 Website built by <span class="dev-credit">Dev Gift</span> | WhatsApp: 09164624021</p>
+        <p>&copy; 2024 Esthyfav Collection. All rights reserved. | Where style meets excellence</p>
+        <p style="margin-top: 12px;">🧑‍💻 Website crafted by <span class="dev-credit">Dev Gift</span> <i class="fas fa-heart" style="color: #ff4444;"></i> | WhatsApp: 09164624021</p>
     </div>
 </footer>
 
 <script>
-    const API_URL = 'http://localhost:3000/api';
+    const API_URL = window.location.origin + '/api';
 
-    // Hide loading screen
+    // ========== THEME TOGGLE ==========
+    function initTheme() {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeUI(savedTheme);
+    }
+
+    function updateThemeUI(theme) {
+        const toggleBtn = document.getElementById('themeToggle');
+        const icon = document.getElementById('themeIcon');
+        const text = document.getElementById('themeText');
+        if (toggleBtn) {
+            if (theme === 'dark') {
+                icon.className = 'fas fa-sun';
+                text.textContent = 'Light';
+            } else {
+                icon.className = 'fas fa-moon';
+                text.textContent = 'Dark';
+            }
+        }
+    }
+
+    function toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeUI(newTheme);
+        showToast(`✨ ${newTheme} mode activated`);
+    }
+
+    document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
+    initTheme();
+
+    // ========== LOADING SCREEN ==========
     window.addEventListener('load', () => {
         setTimeout(() => {
             const loader = document.getElementById('loadingScreen');
@@ -598,7 +858,7 @@
         }, 1000);
     });
 
-    // Load products from API
+    // ========== LOAD PRODUCTS ==========
     async function loadProducts() {
         try {
             const res = await fetch(`${API_URL}/products`);
@@ -609,23 +869,25 @@
                 grid.innerHTML = bestsellers.map(p => `
                     <div class="product-card">
                         <div class="product-image" style="background-image: url('${p.imageUrl || 'https://placehold.co/400x300/1A1A1A/D4AF37?text=Esthyfav'}');">
-                            <span class="bestseller-badge">⭐ Bestseller</span>
+                            <span class="bestseller-badge"><i class="fas fa-star"></i> Bestseller</span>
                         </div>
                         <div class="product-info">
-                            <h4>${p.name}</h4>
+                            <h4>${escapeHtml(p.name)}</h4>
                             <div class="product-price">${p.price}</div>
-                            <button class="product-whatsapp" onclick="orderOnWhatsApp('${p.name}', '${p.price}')">Order on WhatsApp →</button>
+                            <button class="product-whatsapp" onclick="orderOnWhatsApp('${escapeHtml(p.name)}', '${p.price}')">
+                                <i class="fab fa-whatsapp"></i> Order on WhatsApp
+                            </button>
                         </div>
                     </div>
                 `).join('');
             }
-            document.getElementById('statProducts').innerText = products.length + '+';
+            document.getElementById('statProducts').innerHTML = products.length + '+';
         } catch (err) {
             console.error('Error loading products:', err);
         }
     }
 
-    // Load categories
+    // ========== LOAD CATEGORIES ==========
     async function loadCategories() {
         try {
             const res = await fetch(`${API_URL}/categories`);
@@ -633,20 +895,20 @@
             const grid = document.getElementById('categoriesGrid');
             if (grid && categories.length > 0) {
                 grid.innerHTML = categories.map(c => `
-                    <div class="category-card" onclick="filterByCategory('${c.name}')">
+                    <div class="category-card" onclick="filterByCategory('${escapeHtml(c.name)}')">
                         <div class="category-icon">${c.icon || '📦'}</div>
-                        <h3>${c.name}</h3>
-                        <p>Shop Now →</p>
+                        <h3>${escapeHtml(c.name)}</h3>
+                        <p><i class="fas fa-arrow-right"></i> Shop Now</p>
                     </div>
                 `).join('');
             }
-            document.getElementById('statCategories').innerText = categories.length;
+            document.getElementById('statCategories').innerHTML = categories.length;
         } catch (err) {
             console.error('Error loading categories:', err);
         }
     }
 
-    // Order on WhatsApp
+    // ========== ORDER ON WHATSAPP ==========
     function orderOnWhatsApp(productName, productPrice) {
         const phone = '2347058987882';
         const message = `Hello Esthyfav Collection! I'm interested in ordering: ${productName} - ${productPrice}. Please let me know if it's available.`;
@@ -656,11 +918,10 @@
 
     function filterByCategory(category) {
         showToast(`🔍 Showing ${category} products`);
-        // Scroll to products section
         document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Contact form submission
+    // ========== CONTACT FORM ==========
     const contactForm = document.getElementById('contactForm');
     if (contactForm) {
         contactForm.addEventListener('submit', async (e) => {
@@ -679,25 +940,28 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    showToast('✅ Message sent! We will reply soon.');
+                    showToast('✅ Message sent! We will reply within 24 hours.');
                     contactForm.reset();
                 } else {
-                    showToast('❌ Error sending message. Try WhatsApp.');
+                    showToast('❌ Error sending message. Please WhatsApp us.');
                 }
             } catch (err) {
-                showToast('❌ Error. Please WhatsApp us directly.');
+                showToast('❌ Connection error. Please WhatsApp us directly.');
             }
         });
     }
 
+    // ========== TOAST NOTIFICATION ==========
     function showToast(message) {
         const toast = document.getElementById('toast');
-        toast.textContent = message;
+        const span = toast.querySelector('span');
+        if (span) span.textContent = message;
+        else toast.innerHTML = `<i class="fas fa-info-circle"></i> <span>${message}</span>`;
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // Mobile menu toggle
+    // ========== MOBILE MENU ==========
     const mobileMenu = document.getElementById('mobileMenu');
     if (mobileMenu) {
         mobileMenu.addEventListener('click', () => {
@@ -711,14 +975,15 @@
                 navLinks.style.top = '70px';
                 navLinks.style.left = '0';
                 navLinks.style.width = '100%';
-                navLinks.style.background = '#0A0A0A';
-                navLinks.style.padding = '20px';
-                navLinks.style.borderBottom = '1px solid #D4AF37';
+                navLinks.style.background = 'var(--bg-primary)';
+                navLinks.style.padding = '25px';
+                navLinks.style.borderBottom = '1px solid var(--accent)';
+                navLinks.style.gap = '20px';
             }
         });
     }
 
-    // Smooth scroll for anchor links
+    // ========== SMOOTH SCROLL ==========
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
@@ -727,7 +992,18 @@
         });
     });
 
-    // Load data
+    // ========== ESCAPE HTML ==========
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // Initialize
     loadProducts();
     loadCategories();
 </script>
